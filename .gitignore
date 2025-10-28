@@ -1,0 +1,54 @@
+# Build artifacts
+build/
+cmake-build-*/
+CMakeFiles/
+CMakeCache.txt
+Makefile
+*.o
+*.obj
+*.exe
+*.out
+*.a
+*.so
+*.dylib
+*.dll
+
+# CMake exports
+install_manifest.txt
+Testing/
+CTestTestfile.cmake
+
+# CLion / JetBrains
+.idea/
+*.iml
+
+# VS Code
+.vscode/
+
+# macOS filesystem
+.DS_Store
+.AppleDouble
+.LSOverride
+.Spotlight-V100
+.Trashes
+._*
+
+# Crash logs
+*.crash
+*.ips
+
+# Python virtual environments
+.venv/
+venv/
+env/
+
+# Logs
+*.log
+
+# Generated testing output
+*.gcno
+*.gcda
+
+# Certificates (optional if you generate them)
+*.pem
+*.key
