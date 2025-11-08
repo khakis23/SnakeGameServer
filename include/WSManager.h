@@ -4,31 +4,46 @@
 #include <iostream>
 #include <unordered_map>
 #include <uwebsockets/App.h>
-#include <SimpleMsgSender.h>
+#include "ICore.h"
+#include <functional>
+#include <memory>
+#include <string>
 
+
+using CoreFactory = std::function<CorePtr(std::string const& roomID)>;
 
 constexpr int PORT = 9001;
-inline constexpr unsigned short IDLE_TIMEOUT = 10;
+inline constexpr unsigned short IDLE_TIMEOUT = 15;
 
+/*** Per Connection ***/
 struct PerSocketData {
-    std::string room;
-    int seat = -1;   // 0 or 1
-    std::weak_ptr<MessageSender> core;
-};  // per-connection
+    std::string room;   // room ID user subscribes to
+    int seat = 0;      // 1 or 2
+    std::weak_ptr<ICore> core;
+};
 
 using WS = uWS::WebSocket<false, true, PerSocketData>;
 
 
 class WSManager {
-    std::unordered_map<std::string, std::shared_ptr<MessageSender>> rooms;   // active rooms
+    /**
+     * Room ID : <shared>* CoreObject
+     */
+    std::unordered_map<std::string, std::shared_ptr<ICore>> rooms;   // active rooms
+    CoreFactory factory_;
 
     void onConnection(auto *&ud, auto &msg, auto &op, auto *&ws);
-    void onReconnection(auto *&ud, auto &msg, auto *&ws);
+    void messageReceived(WS* &ws, std::string_view& msg, auto op);
+    void closeConnection(WS* &ws, int code, std::string_view& reason);
+
+    /**
+     * @breif Broadcast to room to start Core. Run StartCore logic.
+     */
     void startCore(WS* &ws, auto *&ud);
 public:
-    WSManager();
+    WSManager(CoreFactory factory);
     bool start();
-    void stop();
+    bool stop();
 };
 
 
