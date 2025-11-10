@@ -1,5 +1,5 @@
-#ifndef TWOUSERS_SNAKESERVER_H
-#define TWOUSERS_SNAKESERVER_H
+#ifndef SNAKESERVER_SNAKESERVER_H
+#define SNAKESERVER_SNAKESERVER_H
 #include "ICore.h"
 #include <string>
 #include "SnakeGame.h"
@@ -23,6 +23,7 @@ private:
 std::string SnakeServer::onMessage(int seat, std::string_view msg) {
     // 1. decode msg
     std::unordered_map<std::string, std::string> msg_map;
+
     try {
         msg_map = decodeJSON(msg);
     }
@@ -33,13 +34,13 @@ std::string SnakeServer::onMessage(int seat, std::string_view msg) {
 
     // 2. call game to do something like moveSnake(player=1, Vec2{3, 5})
     for (auto& [key, val] : msg_map) {
-        switch (int key_enum = stoi(key)) {
+        std::cout << seat << " sent -> " << key << " : " << val << std::endl;
+        switch (int key_enum = stoi(key)) {   // TODO parsing issue, ALSO dont need to store player, just use seat
             case MOVE:
                 /*
                  * Format (string):
                  *      MOVE : player,X,Y
                  */
-                std::cout << "MOVE" << std::endl;
                 game.moveSnake(
                     std::stoi(val.substr(0, 1)),   // player
                     strToVec2(val.substr(2))            // Vec2

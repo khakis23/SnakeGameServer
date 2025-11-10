@@ -1,5 +1,18 @@
-#ifndef TWOUSERS_WSSERVER_H
-#define TWOUSERS_WSSERVER_H
+/*
+ *  HOW TO CONNECT A CLIENT:
+ *      1. Establish WS connection on IP:PORT. Upon connection, server will
+ *          send <TEXT>"send room id" to each client.
+ *      2. Each client must respond <TEXT>"<room name/id>".
+ *      3. Once both users have been accepted in a room, the server will send
+ *          <JSON>{"start": <seat (1 or 2)>}.
+ *      4. The core will begin. If another client tries to join the same room,
+ *          the connection will be ended with 1001, <TEXT>"room full"
+ *
+ */
+
+
+#ifndef SNAKESERVER_WSSERVER_H
+#define SNAKESERVER_WSSERVER_H
 
 #include <iostream>
 #include <unordered_map>
@@ -47,4 +60,4 @@ public:
 };
 
 
-#endif //TWOUSERS_WSSERVER_H
+#endif

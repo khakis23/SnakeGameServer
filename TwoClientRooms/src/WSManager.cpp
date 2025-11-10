@@ -1,4 +1,4 @@
-#include "WSManager.h"
+#include "../include/WSManager.h"
 
 
 WSManager::WSManager(CoreFactory factory) : factory_(std::move(factory)) {}
@@ -113,7 +113,7 @@ void WSManager::startCore(WS* &ws, auto *&ud) {
     // two users connected
     std::cout << "room " << ud->room << " has started\n";
     std::string const json_ws = "{\"start\":" + std::to_string(ud->seat) + "}";
-    std::string const json_other = "{\"start\":" + std::string(ud->seat == 1 ? "2" : "1") + "}";
+    std::string const json_other = "{\"start\":" + std::string(ud->seat == 1 ? "2" : "1") + "}";   // TODO check this!
     ws->send(json_ws, uWS::OpCode::TEXT, false);   // direct to this client to fix race condition
     uWS::Loop::get()->defer([ws, ud, json_other]() {
         ws->publish(ud->room, json_other, uWS::OpCode::TEXT, false);

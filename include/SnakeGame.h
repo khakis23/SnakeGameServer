@@ -2,8 +2,8 @@
 // Created by Tyler Black on 11/7/25.
 //
 
-#ifndef TWOUSERS_SNAKE_H
-#define TWOUSERS_SNAKE_H
+#ifndef SNAKESERVER_SNAKE_H
+#define SNAKESERVER_SNAKE_H
 
 #include "utils.h"
 #include <list>
@@ -284,4 +284,4 @@ void Game::debugPrint(std::ostream& os) const {
 }
 
 
-#endif //TWOUSERS_SNAKE_H
+#endif

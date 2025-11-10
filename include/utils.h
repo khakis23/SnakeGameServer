@@ -1,5 +1,5 @@
-#ifndef TWOUSERS_UTILS_H
-#define TWOUSERS_UTILS_H
+#ifndef SNAKESERVER_UTILS_H
+#define SNAKESERVER_UTILS_H
 #include <string>
 
 
@@ -81,4 +81,4 @@ Vec2 strToVec2(std::string str) {
 }
 
 
-#endif //TWOUSERS_UTILS_H
+#endif

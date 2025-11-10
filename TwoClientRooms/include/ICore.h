@@ -2,8 +2,8 @@
 // Created by Tyler Black on 11/7/25.
 //
 
-#ifndef TWOUSERS_ICORE_H
-#define TWOUSERS_ICORE_H
+#ifndef SNAKESERVER_ICORE_H
+#define SNAKESERVER_ICORE_H
 #include <string>
 
 
@@ -24,4 +24,4 @@ public:
 using CorePtr = std::shared_ptr<ICore>;
 
 
-#endif //TWOUSERS_ICORE_H
+#endif

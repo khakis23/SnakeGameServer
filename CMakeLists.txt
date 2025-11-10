@@ -1,20 +1,23 @@
 cmake_minimum_required(VERSION 3.31)
-project(TwoUsers)
+project(SnakeServer)
 
 set(CMAKE_CXX_STANDARD 23)
 
 find_package(unofficial-uwebsockets CONFIG REQUIRED)
-add_executable(TwoUsers main.cpp
-        src/WSManager.cpp
+add_executable(SnakeServer main.cpp
+        TwoClientRooms/src/WSManager.cpp
         include/SimpleMsgSender.h
         src/ServerCore.cpp
         include/ServerCore.h
-        include/ICore.h
+        TwoClientRooms/include/ICore.h
         include/SnakeServer.h
         src/SnakeServer.cpp
         include/SnakeGame.h
         include/utils.h
 )
 
-target_include_directories(TwoUsers PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_link_libraries(TwoUsers PRIVATE unofficial::uwebsockets::uwebsockets)
+target_include_directories(SnakeServer PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/TwoClientRooms/include
+)
+target_link_libraries(SnakeServer PRIVATE unofficial::uwebsockets::uwebsockets)

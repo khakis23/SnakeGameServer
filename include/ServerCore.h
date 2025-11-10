@@ -2,8 +2,8 @@
 // Created by Tyler Black on 11/7/25.
 //
 
-#ifndef TWOUSERS_SERVERCORE_H
-#define TWOUSERS_SERVERCORE_H
+#ifndef SNAKESERVER_SERVERCORE_H
+#define SNAKESERVER_SERVERCORE_H
 
 #include <WSManager.h>
 #include "SnakeServer.h"
@@ -35,4 +35,4 @@ void Server::stop() {
 
 
 
-#endif //TWOUSERS_SERVERCORE_H
+#endif
