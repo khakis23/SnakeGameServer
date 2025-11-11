@@ -9,6 +9,10 @@ struct Vec2 {
     bool operator==(const Vec2 &other) const {
         return x == other.x && y == other.y;
     }
+    friend std::ostream& operator<<(std::ostream& os, const Vec2& v) {
+        os << v.x << ", " << v.y;
+        return os;
+    }
 };
 
 
@@ -37,8 +41,9 @@ std::string toJSON(const std::unordered_map<T, std::string> &kv_pairs) {
 
 std::unordered_map<std::string, std::string> decodeJSON(std::string_view &json) {
     /*
-     * Decode BASIC JSON string(_view)'s -> {"key":"value", "string": "1"}
+     * Decode BASIC JSON string(_view)'s -> {"key":"value", "string": "1,2"}
      */
+    std::cout << "json: " << json << std::endl;
     if (json.empty() || json.size() <= 2)
         return {};
     if (json.front()=='{')   // remove prefix
@@ -50,21 +55,24 @@ std::unordered_map<std::string, std::string> decodeJSON(std::string_view &json) 
     int start = 0;
     while (start < json.size() - 1) {
         int mid = json.find(':', start);
-        int end = json.find(',', mid);
-        if (end == std::string::npos) end = json.size() - 1;   // at the end
+        int end = json.find("\",\"", mid);
+        // at the end of the JSON string
+        if (end == std::string::npos)
+            end = json.size() - 2;
 
         auto key = std::string(json.substr(start + 1, mid - start - 2));
-        auto val = std::string(json.substr(mid + 2, end - mid - 3));
+        auto val = std::string(json.substr(mid + 2, end - mid - 2));
 
         map[key] = val;
-        start = end + 1;
-        std::cout << key << " " << val << "\n";   // debugging
+        start = end + 2;
+        std::cout << key << " : " << val << "\n";   // debugging
     }
     return map;
 }
 
 
 Vec2 strToVec2(std::string str) {
+    std::cout << "str: " << str << std::endl;
     int mid = str.find(',');
     if (mid == std::string::npos)
         throw std::runtime_error("Invalid Vec2: missing ','");

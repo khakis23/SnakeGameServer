@@ -7,6 +7,10 @@ int main() {
     Server server;
     server.run();
 
+    // std::unordered_map<int, std::string> msg = {{MOVE, "1,2"}, {APPLE, "12,7"}};
+    // std::string_view msg_str = toJSON(msg);
+    // decodeJSON(msg_str);
+
     // TODO TESTING!!!
     // Game game;
     // int temp = 0;

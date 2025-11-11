@@ -49,11 +49,9 @@ enum GameCodes {
 
 class Game {
 public:
-    std::unordered_map<GameCodes, std::string> game_codes;
-
     // all public functions must return list a GameCode
     void moveSnake(int player, Vec2 to);
-    std::unordered_map<GameCodes, std::string> getGameCodes() { return game_codes; }
+    std::unordered_map<GameCodes, std::string> getGameCodes(int seat);
     Game();
 
     void debugPrint(std::ostream& os) const;
@@ -65,6 +63,9 @@ private:
     // for random
     std::mt19937 rng;
     std::uniform_int_distribution<int> dist;
+
+    std::unordered_map<GameCodes, std::string> game_codes;
+    bool game_code_received[2] = {false, false};   // 0 == seat 1, 1 == seat 2
 
     void checkCollision();
     void spawnApple();
@@ -281,6 +282,18 @@ void Game::debugPrint(std::ostream& os) const {
     // os << "Legend: " << S1HEAD << "/"<< S1BODY << " P1  "
     //    << S2HEAD << "/"<< S2BODY << " P2  "
     //    << APPLE << " Apple\n";
+}
+
+
+std::unordered_map<GameCodes, std::string> Game::getGameCodes(int seat) {
+    // both clients received last message, reset
+    if (game_code_received[0] && game_code_received[1]) {
+        game_code_received[0] = game_code_received[1] = false;
+        game_codes.clear();
+    }
+
+    game_code_received[seat - 1] = true;
+    return game_codes;
 }
 
 

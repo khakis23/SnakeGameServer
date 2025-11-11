@@ -56,6 +56,7 @@ void WSManager::messageReceived(WS *&ws, std::string_view &msg, auto op) {
     if (auto core = ud->core.lock()) {
         // send message to core, returns its message
         const std::string out_going = core->onMessage(ud->seat, msg);
+        std::cout << "outgoing: " << out_going << '\n';
 
         // publish the outgoing JSON message to all users
         ws->publish(ud->room, out_going, uWS::OpCode::TEXT, false);

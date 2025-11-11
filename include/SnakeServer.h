@@ -23,6 +23,7 @@ private:
 std::string SnakeServer::onMessage(int seat, std::string_view msg) {
     // 1. decode msg
     std::unordered_map<std::string, std::string> msg_map;
+    std::cout << "msg: " << msg << std::endl;
 
     try {
         msg_map = decodeJSON(msg);
@@ -42,9 +43,10 @@ std::string SnakeServer::onMessage(int seat, std::string_view msg) {
                  *      MOVE : player,X,Y
                  */
                 game.moveSnake(
-                    std::stoi(val.substr(0, 1)),   // player
-                    strToVec2(val.substr(2))            // Vec2
+                    seat,   // player
+                    strToVec2(val)            // Vec2
                     );
+                std::cout << "moved: " << strToVec2(val) << std::endl;
                 break;
 
             default:
@@ -54,11 +56,11 @@ std::string SnakeServer::onMessage(int seat, std::string_view msg) {
     }
 
     // 3. package any game code (if any) along with the updated player position
-    auto send = toJSON(game.getGameCodes());
-
     // 4. return a JSON of the package so that it can be published to room
-    if (!send.empty())
+    if (auto send = toJSON(game.getGameCodes(seat)); !send.empty()) {
+        std::cout << "send: " << send << '\n';
         return send;
+    }
     return "";
 }
 
