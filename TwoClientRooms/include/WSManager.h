@@ -1,11 +1,10 @@
 /*
  *  HOW TO CONNECT A CLIENT:
- *      1. Establish WS connection on IP:PORT. Upon connection, server will
- *          send <TEXT>"send room id" to each client.
- *      2. Each client must respond <TEXT>"<room name/id>".
- *      3. Once both users have been accepted in a room, the server will send
+ *      1. Establish WS connection on IP:PORT. Upon connection, each client must
+ *          respond <TEXT>"<room name/id>".
+ *      2. Once both users have been accepted in a room, the server will send
  *          <JSON>{"start": <seat (1 or 2)>}.
- *      4. The core will begin. If another client tries to join the same room,
+ *      3. The core will begin. If another client tries to join the same room,
  *          the connection will be ended with 1001, <TEXT>"room full"
  *
  */
@@ -31,7 +30,7 @@ inline constexpr unsigned short IDLE_TIMEOUT = 15;
 /*** Per Connection ***/
 struct PerSocketData {
     std::string room;   // room ID user subscribes to
-    int seat = 0;      // 1 or 2
+    int seat = 0;      // 1 or 2   // TODO remove this, now handled in message
     std::weak_ptr<ICore> core;
 };
 

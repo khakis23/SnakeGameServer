@@ -36,7 +36,10 @@ struct SnakeGame {
 
 
 enum GameCodes {
+    SEAT,
+
     // To Client
+    START,
     COLLISION,
     APPLE,
     GROW,
@@ -291,8 +294,11 @@ std::unordered_map<GameCodes, std::string> Game::getGameCodes(int seat) {
         game_code_received[0] = game_code_received[1] = false;
         game_codes.clear();
     }
-
     game_code_received[seat - 1] = true;
+
+    auto codes = game_codes;
+    codes[SEAT] = std::to_string(seat);
+
     return game_codes;
 }
 

@@ -39,15 +39,31 @@ std::string toJSON(const std::unordered_map<T, std::string> &kv_pairs) {
 }
 
 
-std::unordered_map<std::string, std::string> decodeJSON(std::string_view &json) {
+template<typename T>
+std::unordered_map<std::string, std::string> decodeJSON(T &json) {
     /*
      * Decode BASIC JSON string(_view)'s -> {"key":"value", "string": "1,2"}
      */
+    // deal with using a template and invalid types
     std::cout << "json: " << json << std::endl;
-    if (json.empty() || json.size() <= 2)
+    try {
+        if (json.empty() || json.size() <= 2)   // yes this will probably crash if not a stringtype,
+            return {};
+    }
+    catch (const std::exception& e) {
+        std::cerr << "Invalid string type in \"decodeJSON\": "<< e.what() << std::endl;
         return {};
-    if (json.front()=='{')   // remove prefix
-        json.remove_prefix(1);
+    }
+
+    // handle remove JSON bracket { from string or string_view
+    if constexpr (std::is_same_v<std::decay_t<T>, std::string>) {
+        if (json[0] == '{')
+            json.erase(0, 1);
+    }
+    else if constexpr (std::is_same_v<std::decay_t<T>, std::string_view>) {
+        if (json.front() == '{')   // remove prefix
+            json.remove_prefix(1);
+    }
 
     std::unordered_map<std::string, std::string> map;
 

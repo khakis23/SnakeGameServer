@@ -17,7 +17,7 @@ public:
     void setUsers(bool connected, int user) { if (user == 0) user1 = connected; else user2 = connected; }
     virtual void start() = 0;
     virtual void stop() = 0;
-    virtual std::string onMessage(int seat, std::string_view msg) = 0;
+    virtual std::string onMessage(std::string_view msg) = 0;
     virtual void onDisconnect(int seat) = 0;
 };
 

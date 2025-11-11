@@ -12,10 +12,9 @@ bool WSManager::start() {
 
             // runs when WS opens
             .open = [&](auto *ws) {
-                ws->send("send room id");   // get room authentication
+                // ws->send("send room id");   // get room authentication
             },
 
-            // first message
             .message = [&](auto *ws, std::string_view msg, uWS::OpCode op) {
                 messageReceived(ws, msg, op);
             },
@@ -55,8 +54,7 @@ void WSManager::messageReceived(WS *&ws, std::string_view &msg, auto op) {
     // normal message path
     if (auto core = ud->core.lock()) {
         // send message to core, returns its message
-        const std::string out_going = core->onMessage(ud->seat, msg);
-        std::cout << "outgoing: " << out_going << '\n';
+        const std::string out_going = core->onMessage(msg);
 
         // publish the outgoing JSON message to all users
         ws->publish(ud->room, out_going, uWS::OpCode::TEXT, false);
@@ -71,7 +69,7 @@ void WSManager::onConnection(auto *&ud, auto &msg, auto &op, auto *&ws) {
     ws->subscribe(ud->room);
 
     auto& core = rooms[ud->room];
-    // create a core if it doesnt already exist
+    // create a core if it doesn't already exist
     if (!core) {
         core = factory_(ud->room);
         if (!core) {
@@ -111,10 +109,11 @@ void WSManager::onConnection(auto *&ud, auto &msg, auto &op, auto *&ws) {
 }
 
 void WSManager::startCore(WS* &ws, auto *&ud) {
+    enum _ {SEAT, START};   // TODO move this
     // two users connected
     std::cout << "room " << ud->room << " has started\n";
-    std::string const json_ws = "{\"start\":" + std::to_string(ud->seat) + "}";
-    std::string const json_other = "{\"start\":" + std::string(ud->seat == 1 ? "2" : "1") + "}";   // TODO check this!
+    std::string const json_ws = "{\"" + std::to_string(int(START)) + "\":\"" + std::to_string(1) + "\"}";
+    std::string const json_other = "{\"" + std::to_string(int(START)) + "\":\"" + std::to_string(2) + "\"}";   // TODO check this!
     ws->send(json_ws, uWS::OpCode::TEXT, false);   // direct to this client to fix race condition
     uWS::Loop::get()->defer([ws, ud, json_other]() {
         ws->publish(ud->room, json_other, uWS::OpCode::TEXT, false);
