@@ -57,8 +57,8 @@ void WSManager::messageReceived(WS *&ws, std::string_view &msg, auto op) {
         const std::string out_going = core->onMessage(msg);
 
         // publish the outgoing JSON message to all users
-        ws->publish(ud->room, out_going, uWS::OpCode::TEXT, false);
-        // TODO might need to ws->send() to sending user due to race conditions...NVM isn't that what ud->seat does??
+        ws->publish(ud->room, out_going, uWS::OpCode::TEXT, false);  // send to everyone else
+        ws->send(out_going, uWS::OpCode::TEXT, false);   // ...and echo to sender
         // std::cout << "sending message to room " << ud->room << "\n";
     }
 }
@@ -109,7 +109,7 @@ void WSManager::onConnection(auto *&ud, auto &msg, auto &op, auto *&ws) {
 }
 
 void WSManager::startCore(WS* &ws, auto *&ud) {
-    enum _ {SEAT, START};   // TODO move this
+    enum _ {SEAT, START};   // TODO move this?
     // two users connected
     std::cout << "room " << ud->room << " has started\n";
     std::string const json_ws = "{\"" + std::to_string(int(START)) + "\":\"" + std::to_string(1) + "\"}";

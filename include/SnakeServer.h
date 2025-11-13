@@ -2,7 +2,7 @@
 #define SNAKESERVER_SNAKESERVER_H
 #include "ICore.h"
 #include <string>
-#include "SnakeGame.h"
+#include "Snake.h"
 
 
 class SnakeServer : public ICore {
@@ -65,9 +65,11 @@ std::string SnakeServer::onMessage(std::string_view msg) {
         }
     }
 
+    game.debugPrint(std::cout);  // TODO temp
+
     // 3. package any game code (if any) along with the updated player position
     // 4. return a JSON of the package so that it can be published to room
-    if (auto send = toJSON(game.getGameCodes(seat)); !send.empty()) {
+    if (auto send = toJSON(game.getGameCodes()); !send.empty()) {
         std::cout << "send: " << send << '\n';
         return send;
     }

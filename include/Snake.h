@@ -20,9 +20,10 @@ struct Apple {
 };
 
 
-struct SnakeGame {
+struct Snake {
+    int player;
     std::list<Vec2> head;
-    SnakeGame(const std::list<Vec2> &snake) : head(snake) {}
+    Snake(const std::list<Vec2> &snake, int p) : player(p), head(snake) {}
 };
 
 
@@ -54,14 +55,14 @@ class Game {
 public:
     // all public functions must return list a GameCode
     void moveSnake(int player, Vec2 to);
-    std::unordered_map<GameCodes, std::string> getGameCodes(int seat);
+    std::unordered_map<GameCodes, std::string> getGameCodes();
     Game();
 
     void debugPrint(std::ostream& os) const;
 
 private:
-    SnakeGame p1;
-    SnakeGame p2;
+    Snake p1;
+    Snake p2;
     Apple apple;
     // for random
     std::mt19937 rng;
@@ -71,6 +72,7 @@ private:
     bool game_code_received[2] = {false, false};   // 0 == seat 1, 1 == seat 2
 
     void checkCollision();
+    void checkCollisionHelper(const Snake &a, const Snake &b);
     void spawnApple();
 };
 
@@ -80,9 +82,9 @@ Game::Game() :
     rng(std::random_device{}()),
     dist(0, GAME_SIZE - 1),
     // init snakes
-    p1({Vec2{GAME_SIZE / 4, GAME_SIZE / 2}}),
-    p2({Vec2{3 * GAME_SIZE / 4, GAME_SIZE / 2}}) {
-    for (int i = 1; i < 3; i++) {
+    p1({Vec2{GAME_SIZE / 4, GAME_SIZE / 2}}, 1),
+    p2({Vec2{3 * GAME_SIZE / 4, GAME_SIZE / 2}}, 2) {
+    for (int i = 1; i < 3; i++) {   // add body parts
         p1.head.push_back(Vec2{p1.head.front().x, p1.head.front().y + i});
         p2.head.push_back(Vec2{p2.head.front().x, p2.head.front().y - i});
     }
@@ -130,7 +132,7 @@ void Game::spawnApple() {
 
 
 void Game::moveSnake(int player, Vec2 to) {
-    SnakeGame* snake = player == 1 ? &p1 : &p2;
+    Snake* snake = player == 1 ? &p1 : &p2;
     // std::cout << "player " << player << " moved" << std::endl;
 
     // move snake
@@ -143,78 +145,55 @@ void Game::moveSnake(int player, Vec2 to) {
 
 
 void Game::checkCollision() {
-    Vec2 p1_head = p1.head.front();
-    Vec2 p2_head = p2.head.front();
+    checkCollisionHelper(p1, p2);
+    checkCollisionHelper(p2, p1);
+}
+
+
+void Game::checkCollisionHelper(const Snake &a, const Snake &b) {
+    const Vec2* a_head = &a.head.front();
 
     // check apple collision
-    if (p1_head == apple.pos) {
-        game_codes[GROW] = "1";
-        spawnApple();
-    }
-    else if (p2_head == apple.pos) {
-        game_codes[GROW] = "2";
+    if (*a_head == apple.pos) {
+        game_codes[GROW] = std::to_string(a.player);
+        /*
+         * TODO this could complicated...my idea at the moment is:
+         *  1. send the GROW game code to client
+         *  2. client then also returns a GROW game code to server next time it sends a MOVE
+         *  3. then a growSnake() method is called that actually updates server-side snake
+         */
         spawnApple();
     }
 
     // wall collision
-    if (p1_head.x < 0 || p1_head.x >= GAME_SIZE
-        || p1_head.y < 0 || p1_head.y >= GAME_SIZE) {
+    if (a_head->x < 0 || a_head->x >= GAME_SIZE
+        || a_head->y < 0 || a_head->y >= GAME_SIZE) {
         // TODO GAME OVER
-        game_codes[COLLISION] = "1";
-        return;
-    }
-    if (p2_head.x < 0 || p2_head.x >= GAME_SIZE
-        || p2_head.y < 0 || p2_head.y >= GAME_SIZE) {
-        // TODO GAME OVER
-        game_codes[COLLISION] = "2";
+        game_codes[COLLISION] = std::to_string(a.player);
         return;
     }
 
-    // self-collision with own body (skip head)
+    // both heads collide, pick random winner
+    if (*a_head == b.head.front()) {
+        std::uniform_int_distribution<int> d(1, 2);
+        game_codes[COLLISION] = std::to_string(d(rng));
+        return;
+    }
+
+    // self-collision snake bodies
+    // P1 body iteration
     for (auto iter = std::next(p1.head.begin()); iter != p1.head.end(); ++iter) {
-        if (*iter == p1_head) {
-            // TODO GAME OVER
-            game_codes[COLLISION] = "1";
+        if (*iter == *a_head) {   // P1 collided with self
+            game_codes[COLLISION] = std::to_string(a.player);
             return;
         }
-    }
-    for (auto iter = std::next(p2.head.begin()); iter != p2.head.end(); ++iter) {
-        if (*iter == p2_head) {
-            // TODO GAME OVER
-            game_codes[COLLISION] = "2";
+        if (*iter == b.head.front()) {   // P2 collided with P2 body
+            game_codes[COLLISION] = std::to_string(b.player);
             return;
-        }
-    }
-
-    // collision with other snake
-    for (int i = 1; i <= 2; i++) {
-        std::list<Vec2>::iterator iter, end;
-        Vec2 other;
-        int other_i;
-
-        if (i == 1) {
-            iter = p1.head.begin();
-            end = p1.head.end();
-            other = p1_head;
-            other_i = 2;
-        }
-        else {
-            iter = p2.head.begin();
-            end = p2.head.end();
-            other = p2_head;
-            other_i = 1;
-        }
-
-        while (iter != end) {
-            if (*iter == other) {
-                // TODO GAME OVER
-                game_codes[COLLISION] = std::to_string(other_i);
-                return;
-            }
-            ++iter;
         }
     }
 }
+
 
 
 void Game::debugPrint(std::ostream& os) const {
@@ -228,7 +207,12 @@ void Game::debugPrint(std::ostream& os) const {
     constexpr const char* S2HEAD = "█";   // same head glyph
     constexpr const char* APPLE  = "●";
 
-    system("clear");
+    // clear screen
+    #if defined(_WIN32)
+            std::system("cls");
+    #else
+            std::system("clear");
+    #endif
 
     std::vector<std::vector<const char*>> board(
         GAME_SIZE, std::vector<const char*>(GAME_SIZE, EMPTY)
@@ -288,18 +272,10 @@ void Game::debugPrint(std::ostream& os) const {
 }
 
 
-std::unordered_map<GameCodes, std::string> Game::getGameCodes(int seat) {
-    // both clients received last message, reset
-    if (game_code_received[0] && game_code_received[1]) {
-        game_code_received[0] = game_code_received[1] = false;
-        game_codes.clear();
-    }
-    game_code_received[seat - 1] = true;
-
-    auto codes = game_codes;
-    codes[SEAT] = std::to_string(seat);
-
-    return game_codes;
+std::unordered_map<GameCodes, std::string> Game::getGameCodes() {
+    auto temp = game_codes;
+    game_codes.clear();
+    return temp;
 }
 
 

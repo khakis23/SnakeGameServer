@@ -12,7 +12,7 @@ add_executable(SnakeServer main.cpp
         TwoClientRooms/include/ICore.h
         include/SnakeServer.h
         src/SnakeServer.cpp
-        include/SnakeGame.h
+        include/Snake.h
         include/utils.h
 )
 

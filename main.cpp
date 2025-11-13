@@ -1,7 +1,8 @@
 #include "ServerCore.h"
-#include "SnakeGame.h"  // TODO TESTING
+#include "Snake.h"  // TODO TESTING
 #include <thread>
 #include <chrono>
+
 
 int main() {
     Server server;
