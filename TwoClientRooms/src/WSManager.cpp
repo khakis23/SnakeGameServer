@@ -120,7 +120,9 @@ void WSManager::startCore(WS* &ws, auto *&ud) {
     });
 
     // start Core
-    rooms[ud->room]->start();
+    auto msg = rooms[ud->room]->start();
+    ws->publish(ud->room, msg, uWS::OpCode::TEXT, false);
+    ws->send(msg, uWS::OpCode::TEXT, false);
 }
 
 

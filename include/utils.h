@@ -1,8 +1,12 @@
 #ifndef SNAKESERVER_UTILS_H
 #define SNAKESERVER_UTILS_H
+
 #include <string>
+#include <iostream>
+#include <unordered_map>
 
 
+// Basic Vector2
 struct Vec2 {
     int x;
     int y;
@@ -16,6 +20,7 @@ struct Vec2 {
 };
 
 
+// hash overload for Vec2
 template<> struct std::hash<Vec2> {
     size_t operator()(const Vec2& v) const noexcept {
         return (static_cast<size_t>(v.x) * 73856093u) ^ (static_cast<size_t>(v.y) * 19349663u);
@@ -87,7 +92,7 @@ std::unordered_map<std::string, std::string> decodeJSON(T &json) {
 }
 
 
-Vec2 strToVec2(std::string str) {
+inline Vec2 strToVec2(std::string str) {
     std::cout << "str: " << str << std::endl;
     int mid = str.find(',');
     if (mid == std::string::npos)

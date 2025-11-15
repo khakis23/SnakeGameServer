@@ -8,6 +8,7 @@
 #include <WSManager.h>
 #include "SnakeServer.h"
 
+
 class Server {
 public:
     Server();
@@ -18,18 +19,18 @@ private:
 };
 
 
-Server::Server()
+inline Server::Server()
 : wsm_{
     [](const std::string& /**/) -> CorePtr {
         return std::make_shared<SnakeServer>();
     }
 } {}
 
-void Server::run() {
+inline void Server::run() {
     wsm_.start();
 }
 
-void Server::stop() {
+inline void Server::stop() {
     wsm_.stop();
 }
 

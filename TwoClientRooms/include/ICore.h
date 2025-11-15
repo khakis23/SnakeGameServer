@@ -15,8 +15,8 @@ public:
 
     std::pair<bool, bool> getUsers() { return {user1, user2}; }
     void setUsers(bool connected, int user) { if (user == 0) user1 = connected; else user2 = connected; }
-    virtual void start() = 0;
-    virtual void stop() = 0;
+    virtual std::string start() = 0;
+    virtual std::string stop() = 0;
     virtual std::string onMessage(std::string_view msg) = 0;
     virtual void onDisconnect(int seat) = 0;
 };
