@@ -16,10 +16,10 @@ struct Apple {
 
 
 struct Snake {
-    int player;          // 1 or 2
+    int score = 0;
+    int player = 0;      // 1 or 2
     bool grow = false;   // grow flag (growing happens on next frame for server)
     std::list<Vec2> head;
-    Snake(const std::list<Vec2> &snake, int p) : player(p), head(snake) {}
 };
 
 
@@ -44,6 +44,11 @@ public:
      * @return
      */
     std::unordered_map<GameCodes, std::string> getGameCodes();
+
+    /**
+     *
+     */
+    void reset();
 
     /**
      *
@@ -73,8 +78,9 @@ private:
     /*** PRIVATE METHODS ***/
 
     void checkCollision();
-    void checkCollisionHelper(Snake &a, const Snake &b);
+    void checkCollisionHelper(Snake &a, Snake &b);
     void spawnApple();
+    void setupGame();
 };
 
 

@@ -5,9 +5,8 @@
 
 // Essential to both server and client
 enum GameCodes {
-    SEAT,
-
     // To Client
+    SEAT,
     START,
     COLLISION,
     APPLE,

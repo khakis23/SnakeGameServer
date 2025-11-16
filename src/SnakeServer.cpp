@@ -33,10 +33,10 @@ std::string SnakeServer::onMessage(std::string_view msg) {
     for (auto& [key, val] : msg_map) {
         std::cout << seat << " sent -> " << key << " : " << val << std::endl;
         switch (stoi(key)) {
+
             case MOVE:
                 /*
-                 * Format (string):
-                 *      MOVE : player,X,Y
+                 * MOVE : player,X,Y
                  */
                 game.moveSnake(
                     seat,   // player
@@ -46,12 +46,16 @@ std::string SnakeServer::onMessage(std::string_view msg) {
                 break;
 
             case RESET:
-                // TODO reset game
+                /*
+                 * RESET : 0
+                 */
+                std::cout << "resetting game\n";
+                game.reset();
                 break;
 
             default:
                 std::cerr << "unknown key: " << key << std::endl;
-                return "";
+                break;
         }
     }
 

@@ -6,17 +6,9 @@ Game::Game() :
     // init random
     rng(std::random_device{}()),
     dist(0, GAME_SIZE - 1),
-    // init snakes
-    p1({Vec2{GAME_SIZE / 4, GAME_SIZE / 2}}, 1),
-    p2({Vec2{3 * GAME_SIZE / 4, GAME_SIZE / 2}}, 2) {
-    for (int i = 1; i < 3; i++) {   // add body parts
-        p1.head.push_back(Vec2{p1.head.front().x, p1.head.front().y + i});
-        p2.head.push_back(Vec2{p2.head.front().x, p2.head.front().y - i});
-    }
-
-    spawnApple();
+    apple() {
+    setupGame();   // inits everything for the game
 }
-
 
 void Game::spawnApple() {
     Vec2 apple_pos = {dist(rng), dist(rng)};
@@ -55,7 +47,6 @@ void Game::spawnApple() {
     game_codes[APPLE] = std::to_string(apple_pos.x) + ',' + std::to_string(apple_pos.y);
 }
 
-
 void Game::moveSnake(int player, const Vec2 &to) {
     Snake* snake = player == 1 ? &p1 : &p2;
     // std::cout << "player " << player << " moved" << std::endl;
@@ -78,7 +69,7 @@ void Game::checkCollision() {
 }
 
 
-void Game::checkCollisionHelper(Snake &a, const Snake &b) {
+void Game::checkCollisionHelper(Snake &a, Snake &b) {
     const Vec2* a_head = &a.head.front();
 
     // check apple collision
@@ -91,7 +82,7 @@ void Game::checkCollisionHelper(Snake &a, const Snake &b) {
     // wall collision
     if (a_head->x < 0 || a_head->x >= GAME_SIZE
         || a_head->y < 0 || a_head->y >= GAME_SIZE) {
-        // TODO GAME OVER
+        b.score++;
         game_codes[COLLISION] = std::to_string(a.player);
         return;
     }
@@ -99,25 +90,60 @@ void Game::checkCollisionHelper(Snake &a, const Snake &b) {
     // both heads collide, pick random winner
     if (*a_head == b.head.front()) {
         std::uniform_int_distribution<int> d(1, 2);
-        game_codes[COLLISION] = std::to_string(d(rng));
+        const int loser = d(rng);
+        game_codes[COLLISION] = std::to_string(loser);
+        if (loser == a.player)
+            b.score++;
+        else
+            a.score++;
         return;
     }
 
     // self-collision snake bodies
-    // P1 body iteration
+    // A body iteration
     for (auto iter = std::next(p1.head.begin()); iter != p1.head.end(); ++iter) {
-        if (*iter == *a_head) {   // P1 collided with self
+        if (*iter == *a_head) {   // A collided with self
             game_codes[COLLISION] = std::to_string(a.player);
+            b.score++;
             return;
         }
-        if (*iter == b.head.front()) {   // P2 collided with P2 body
+        if (*iter == b.head.front()) {   // B collided with B body
             game_codes[COLLISION] = std::to_string(b.player);
+            a.score++;
             return;
         }
     }
 }
 
+std::unordered_map<GameCodes, std::string> Game::getGameCodes() {
+    auto temp = game_codes;
+    game_codes.clear();
+    return temp;
+}
 
+void Game::setupGame() {
+    // clear snake
+    if (!p1.head.empty())
+        for (auto* s : {&p1, &p2})
+            s->head.clear();
+
+    // create head
+    p1.head.push_back({GAME_SIZE / 4, GAME_SIZE / 2});
+    p2.head.push_back({3 * GAME_SIZE / 4, GAME_SIZE / 2});
+
+    // add body parts
+    for (int i = 1; i < 3; i++) {
+        p1.head.push_back({p1.head.front().x, p1.head.front().y + i});
+        p2.head.push_back({p2.head.front().x, p2.head.front().y - i});
+    }
+
+    spawnApple();
+}
+
+void Game::reset() {
+    game_codes.clear();
+    setupGame();
+}
 
 void Game::debugPrint(std::ostream& os) const {
     /*
@@ -192,11 +218,4 @@ void Game::debugPrint(std::ostream& os) const {
     // os << "Legend: " << S1HEAD << "/"<< S1BODY << " P1  "
     //    << S2HEAD << "/"<< S2BODY << " P2  "
     //    << APPLE << " Apple\n";
-}
-
-
-std::unordered_map<GameCodes, std::string> Game::getGameCodes() {
-    auto temp = game_codes;
-    game_codes.clear();
-    return temp;
 }
