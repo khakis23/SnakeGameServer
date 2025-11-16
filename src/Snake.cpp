@@ -122,10 +122,15 @@ std::unordered_map<GameCodes, std::string> Game::getGameCodes() {
 }
 
 void Game::setupGame() {
-    // clear snake
+    // non-first init
     if (!p1.head.empty())
         for (auto* s : {&p1, &p2})
             s->head.clear();
+    // first ini
+    else {
+        p1.player = 1;
+        p2.player = 2;
+    }
 
     // create head
     p1.head.push_back({GAME_SIZE / 4, GAME_SIZE / 2});

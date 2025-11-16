@@ -27,9 +27,10 @@ public:
     /**
      *
      * @param msg
+     * @param seat
      * @return
      */
-    std::string onMessage(std::string_view msg) override;
+    std::string onMessage(std::string_view msg, int seat) override;
 
     /**
      *

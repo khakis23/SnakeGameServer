@@ -6,7 +6,7 @@ std::string SnakeServer::start() {
 }
 
 
-std::string SnakeServer::onMessage(std::string_view msg) {
+std::string SnakeServer::onMessage(std::string_view msg, int seat) {
     // 1. decode msg
     std::unordered_map<std::string, std::string> msg_map;
     std::cout << "msg: " << msg << std::endl;
@@ -19,15 +19,15 @@ std::string SnakeServer::onMessage(std::string_view msg) {
         return "";
     }
 
-    // get SEAT from msg
-    auto iter = msg_map.find(std::to_string(SEAT));
-    if (iter == msg_map.end()) {
-        std::cerr << "Message missing seat." << std::endl;
-        return "";
-    }
-    std::cout << "seat: " << iter->second << '\n';
-    const int seat = stoi(iter->second);
-    msg_map.erase(iter);
+    // // get SEAT from msg     NO LONGER USING
+    // auto iter = msg_map.find(std::to_string(SEAT));
+    // if (iter == msg_map.end()) {
+    //     std::cerr << "Message missing seat." << std::endl;
+    //     return "";
+    // }
+    // std::cout << "seat: " << iter->second << '\n';
+    // const int seat = stoi(iter->second);
+    // msg_map.erase(iter);
 
     // 2. call game to do something like moveSnake(player=1, Vec2{3, 5})
     for (auto& [key, val] : msg_map) {

@@ -22,19 +22,18 @@
 #include <string>
 
 
-using CoreFactory = std::function<CorePtr(std::string const& roomID)>;
-
 constexpr int PORT = 9001;
 inline constexpr unsigned short IDLE_TIMEOUT = 15;
 
 /*** Per Connection ***/
 struct PerSocketData {
     std::string room;   // room ID user subscribes to
-    int seat = 0;      // 1 or 2   // TODO remove this, now handled in message
+    int seat = 0;      // 1 or 2
     std::weak_ptr<ICore> core;
 };
 
 using WS = uWS::WebSocket<false, true, PerSocketData>;
+using CoreFactory = std::function<CorePtr(std::string const& roomID)>;   // ICore
 
 
 class WSManager {

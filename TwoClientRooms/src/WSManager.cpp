@@ -1,4 +1,5 @@
 #include "../include/WSManager.h"
+#include "gamecodes.h"   // only being used for START which is code (int) 1, imported for clarity of this project
 
 
 WSManager::WSManager(CoreFactory factory) : factory_(std::move(factory)) {}
@@ -52,9 +53,9 @@ void WSManager::messageReceived(WS *&ws, std::string_view &msg, auto op) {
     }
 
     // normal message path
-    if (auto core = ud->core.lock()) {
+    if (const auto core = ud->core.lock()) {
         // send message to core, returns its message
-        const std::string out_going = core->onMessage(msg);
+        const std::string out_going = core->onMessage(msg, ud->seat);
 
         // publish the outgoing JSON message to all users
         ws->publish(ud->room, out_going, uWS::OpCode::TEXT, false);  // send to everyone else
@@ -109,11 +110,10 @@ void WSManager::onConnection(auto *&ud, auto &msg, auto &op, auto *&ws) {
 }
 
 void WSManager::startCore(WS* &ws, auto *&ud) {
-    enum _ {SEAT, START};   // TODO move this?
     // two users connected
     std::cout << "room " << ud->room << " has started\n";
-    std::string const json_ws = "{\"" + std::to_string(int(START)) + "\":\"" + std::to_string(1) + "\"}";
-    std::string const json_other = "{\"" + std::to_string(int(START)) + "\":\"" + std::to_string(2) + "\"}";   // TODO check this!
+    std::string const json_ws = "{\"" + std::to_string(int(START)) + "\":\"" + std::to_string(ud->seat) + "\"}";
+    std::string const json_other = "{\"" + std::to_string(int(START)) + "\":\"" + std::to_string(ud->seat) + "\"}";
     ws->send(json_ws, uWS::OpCode::TEXT, false);   // direct to this client to fix race condition
     uWS::Loop::get()->defer([ws, ud, json_other]() {
         ws->publish(ud->room, json_other, uWS::OpCode::TEXT, false);
