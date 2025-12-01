@@ -14,20 +14,22 @@ public:
 
     /**
      *
-     * @return
+     * @return game codes
      */
     std::string start() override;
 
     /**
+     * @brief NOT BEING USED
      *
      * @return
      */
     std::string stop() override { return ""; };
 
     /**
+     * @brief controls server-side game by decoding <msg> from player <seat>
      *
-     * @param msg
-     * @param seat
+     * @param msg  messages received from WebSocket
+     * @param seat player number (1 or 2)
      * @return
      */
     std::string onMessage(std::string_view msg, int seat) override;
@@ -36,7 +38,7 @@ public:
      *
      * @param seat
      */
-    void onDisconnect(int seat) override {};
+    void onDisconnect(int seat) override;
 
 
     /*** NEW METHODS ***/
@@ -48,6 +50,7 @@ private:
     /*** ATTRIBUTES ***/
 
     Game game;
+    bool ready[2] = {false, false};
 };
 
 

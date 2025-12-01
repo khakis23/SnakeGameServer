@@ -8,41 +8,48 @@ std::string SnakeServer::start() {
 
 std::string SnakeServer::onMessage(std::string_view msg, int seat) {
     // 1. decode msg
-    std::unordered_map<std::string, std::string> msg_map;
+    std::unordered_map<std::string, std::string> msg_map_in;
+    std::unordered_map<int, std::string> msg_map_out;
+
     std::cout << "msg: " << msg << std::endl;
 
     try {
-        msg_map = decodeJSON(msg);
+        msg_map_in = decodeJSON(msg);
     }
     catch (std::runtime_error& e) {
         std::cerr << e.what() << std::endl;
         return "";
     }
 
-    // // get SEAT from msg     NO LONGER USING
-    // auto iter = msg_map.find(std::to_string(SEAT));
-    // if (iter == msg_map.end()) {
-    //     std::cerr << "Message missing seat." << std::endl;
-    //     return "";
-    // }
-    // std::cout << "seat: " << iter->second << '\n';
-    // const int seat = stoi(iter->second);
-    // msg_map.erase(iter);
-
     // 2. call game to do something like moveSnake(player=1, Vec2{3, 5})
-    for (auto& [key, val] : msg_map) {
-        std::cout << seat << " sent -> " << key << " : " << val << std::endl;
-        switch (stoi(key)) {
+    for (auto& [key_string, val] : msg_map_in) {
+        std::cout << seat << " sent -> " << key_string << " : " << val << std::endl;
+        int key = std::stoi(key_string);
+        switch (key) {
 
             case MOVE:
                 /*
-                 * MOVE : player,X,Y
+                 * MOVE : X,Y
                  */
                 game.moveSnake(
                     seat,   // player
                     strToVec2(val)            // Vec2
                     );
-                std::cout << "moved: " << strToVec2(val) << std::endl;
+                // std::cout << "moved: " << strToVec2(val) << std::endl;
+                break;
+
+            case READY:
+                /*
+                 * READY : player
+                 */
+                ready[seat - 1] = true;
+                if (ready[0] && ready[1]) {
+                    std::cout << "Game Starting\n";
+                    ready[0] = ready[1] = false;   // reset
+                    auto codes = game.getGameCodes();
+                    codes[SET] = "0";
+                    return toJSON(codes);
+                }
                 break;
 
             case RESET:
@@ -59,7 +66,7 @@ std::string SnakeServer::onMessage(std::string_view msg, int seat) {
         }
     }
 
-    game.debugPrint(std::cout);  // TODO temp
+    // game.debugPrint(std::cout);  // TODO temp
 
     // 3. package any game code (if any) along with the updated player position
     // 4. return a JSON of the package so that it can be published to room
@@ -68,4 +75,9 @@ std::string SnakeServer::onMessage(std::string_view msg, int seat) {
         return send;
     }
     return "";
+}
+
+void SnakeServer::onDisconnect(int seat) {
+    std::cout << "Disconnect: " << seat << std::endl;
+    game.forceGameOver(seat);
 }

@@ -113,11 +113,11 @@ void WSManager::startCore(WS* &ws, auto *&ud) {
     // two users connected
     std::cout << "room " << ud->room << " has started\n";
     std::string const json_ws = "{\"" + std::to_string(int(START)) + "\":\"" + std::to_string(ud->seat) + "\"}";
-    std::string const json_other = "{\"" + std::to_string(int(START)) + "\":\"" + std::to_string(ud->seat) + "\"}";
+    std::string const json_other = "{\"" + std::to_string(int(START)) + "\":\"" + (ud->seat == 1 ? "2" : "1") + "\"}";
     ws->send(json_ws, uWS::OpCode::TEXT, false);   // direct to this client to fix race condition
-    uWS::Loop::get()->defer([ws, ud, json_other]() {
+    // uWS::Loop::get()->defer([ws, ud, json_other]() {
         ws->publish(ud->room, json_other, uWS::OpCode::TEXT, false);
-    });
+    // });
 
     // start Core
     auto msg = rooms[ud->room]->start();

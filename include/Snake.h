@@ -7,7 +7,8 @@
 #include "gamecodes.h"
 
 
-constexpr int GAME_SIZE = 10;
+// must match clients' GAME_SIZE
+constexpr int GAME_SIZE = 30;
 
 
 struct Apple {
@@ -33,26 +34,30 @@ public:
     /*** METHODS ***/
 
     /**
+     * @breif move <player> snake head to coordinate position <to>
      *
-     * @param player
-     * @param to
+     * @param player 1 or 2
+     * @param to     (x,y) coordinate
      */
     void moveSnake(int player, const Vec2 &to);
 
     /**
+     * @brief get games codes hash map
      *
-     * @return
+     * @return games codes hash map
      */
     std::unordered_map<GameCodes, std::string> getGameCodes();
 
     /**
-     *
+     * @brief reset game map (does not reset scores or data)
      */
     void reset();
 
-    /**
-     *
+    /*
+     * @brief force a game to end by sending DISCONNECT to clients
      */
+    void forceGameOver(int player_num);
+
     Game();
 
 

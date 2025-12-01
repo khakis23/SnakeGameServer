@@ -58,6 +58,8 @@ void Game::moveSnake(int player, const Vec2 &to) {
     else
         snake->grow = false;      // snake grew last frame, so no need to pop_back()
 
+    game_codes[MOVE] = std::to_string(to.x) + ',' + std::to_string(to.y);
+
     // check collision
     checkCollision();
 }
@@ -82,8 +84,9 @@ void Game::checkCollisionHelper(Snake &a, Snake &b) {
     // wall collision
     if (a_head->x < 0 || a_head->x >= GAME_SIZE
         || a_head->y < 0 || a_head->y >= GAME_SIZE) {
-        b.score++;
+        b.score += b.head.size();
         game_codes[COLLISION] = std::to_string(a.player);
+        game_codes[SCORE] = std::to_string(p1.score) + "," + std::to_string(p2.score);
         return;
     }
 
@@ -91,25 +94,28 @@ void Game::checkCollisionHelper(Snake &a, Snake &b) {
     if (*a_head == b.head.front()) {
         std::uniform_int_distribution<int> d(1, 2);
         const int loser = d(rng);
-        game_codes[COLLISION] = std::to_string(loser);
         if (loser == a.player)
-            b.score++;
+            b.score += b.head.size();
         else
-            a.score++;
+            a.score += a.head.size();
+        game_codes[COLLISION] = std::to_string(loser);
+        game_codes[SCORE] = std::to_string(p1.score) + "," + std::to_string(p2.score);
         return;
     }
 
     // self-collision snake bodies
     // A body iteration
-    for (auto iter = std::next(p1.head.begin()); iter != p1.head.end(); ++iter) {
+    for (auto iter = std::next(a.head.begin()); iter != a.head.end(); ++iter) {
         if (*iter == *a_head) {   // A collided with self
+            b.score += b.head.size();
             game_codes[COLLISION] = std::to_string(a.player);
-            b.score++;
+            game_codes[SCORE] = std::to_string(p1.score) + "," + std::to_string(p2.score);
             return;
         }
         if (*iter == b.head.front()) {   // B collided with B body
+            a.score += a.head.size();
             game_codes[COLLISION] = std::to_string(b.player);
-            a.score++;
+            game_codes[SCORE] = std::to_string(p1.score) + "," + std::to_string(p2.score);
             return;
         }
     }
@@ -126,7 +132,7 @@ void Game::setupGame() {
     if (!p1.head.empty())
         for (auto* s : {&p1, &p2})
             s->head.clear();
-    // first ini
+    // first init
     else {
         p1.player = 1;
         p2.player = 2;
@@ -148,6 +154,11 @@ void Game::setupGame() {
 void Game::reset() {
     game_codes.clear();
     setupGame();
+}
+
+void Game::forceGameOver(int player) {
+    game_codes.clear();
+    game_codes[DISCONNECT] = std::to_string(player);
 }
 
 void Game::debugPrint(std::ostream& os) const {
