@@ -10,6 +10,69 @@ Game::Game() :
     setupGame();   // inits everything for the game
 }
 
+
+/***** PUBLIC METHODS *****/
+
+void Game::moveSnake(int player, const Vec2 &to) {
+    Snake* snake = player == 1 ? &p1 : &p2;
+    // std::cout << "player " << player << " moved" << std::endl;
+
+    // move snake
+    snake->head.push_front(to);
+    if (!snake->grow)
+        snake->head.pop_back();   // normal snake movement
+    else
+        snake->grow = false;      // snake grew last frame, so no need to pop_back()
+
+    game_codes[MOVE] = std::to_string(to.x) + ',' + std::to_string(to.y);
+
+    // check collision
+    checkCollision();
+}
+
+std::unordered_map<GameCodes, std::string> Game::getGameCodes() {
+    auto temp = game_codes;
+    game_codes.clear();
+    return temp;
+}
+
+void Game::reset() {
+    game_codes.clear();
+    setupGame();
+}
+
+void Game::forceGameOver(int player) {
+    game_codes.clear();
+    game_codes[DISCONNECT] = std::to_string(player);
+}
+
+
+/***** PRIVATE METHODS / GAME LOGIC *****/
+
+void Game::setupGame() {
+    // non-first init
+    if (!p1.head.empty())
+        for (auto* s : {&p1, &p2})
+            s->head.clear();
+    // first init
+    else {
+        p1.player = 1;
+        p2.player = 2;
+    }
+
+    // create head
+    p1.head.push_back({GAME_SIZE / 4, GAME_SIZE / 2});
+    p2.head.push_back({3 * GAME_SIZE / 4, GAME_SIZE / 2});
+
+    // add body parts
+    for (int i = 1; i < 3; i++) {
+        p1.head.push_back({p1.head.front().x, p1.head.front().y + i});
+        p2.head.push_back({p2.head.front().x, p2.head.front().y - i});
+    }
+
+    spawnApple();
+}
+
 void Game::spawnApple() {
     Vec2 apple_pos = {dist(rng), dist(rng)};
 
@@ -45,23 +108,6 @@ void Game::spawnApple() {
     }
     apple.pos = apple_pos;
     game_codes[APPLE] = std::to_string(apple_pos.x) + ',' + std::to_string(apple_pos.y);
-}
-
-void Game::moveSnake(int player, const Vec2 &to) {
-    Snake* snake = player == 1 ? &p1 : &p2;
-    // std::cout << "player " << player << " moved" << std::endl;
-
-    // move snake
-    snake->head.push_front(to);
-    if (!snake->grow)
-        snake->head.pop_back();   // normal snake movement
-    else
-        snake->grow = false;      // snake grew last frame, so no need to pop_back()
-
-    game_codes[MOVE] = std::to_string(to.x) + ',' + std::to_string(to.y);
-
-    // check collision
-    checkCollision();
 }
 
 
@@ -121,46 +167,8 @@ void Game::checkCollisionHelper(Snake &a, Snake &b) {
     }
 }
 
-std::unordered_map<GameCodes, std::string> Game::getGameCodes() {
-    auto temp = game_codes;
-    game_codes.clear();
-    return temp;
-}
 
-void Game::setupGame() {
-    // non-first init
-    if (!p1.head.empty())
-        for (auto* s : {&p1, &p2})
-            s->head.clear();
-    // first init
-    else {
-        p1.player = 1;
-        p2.player = 2;
-    }
-
-    // create head
-    p1.head.push_back({GAME_SIZE / 4, GAME_SIZE / 2});
-    p2.head.push_back({3 * GAME_SIZE / 4, GAME_SIZE / 2});
-
-    // add body parts
-    for (int i = 1; i < 3; i++) {
-        p1.head.push_back({p1.head.front().x, p1.head.front().y + i});
-        p2.head.push_back({p2.head.front().x, p2.head.front().y - i});
-    }
-
-    spawnApple();
-}
-
-void Game::reset() {
-    game_codes.clear();
-    setupGame();
-}
-
-void Game::forceGameOver(int player) {
-    game_codes.clear();
-    game_codes[DISCONNECT] = std::to_string(player);
-}
-
+/*** DEBUG PRINT ***/
 void Game::debugPrint(std::ostream& os) const {
     /*
      * Chat wrote most of this method, no credit to me if ever breaks...
@@ -230,8 +238,4 @@ void Game::debugPrint(std::ostream& os) const {
     os << "└";
     for (int x = 0; x < GAME_SIZE; ++x) os << "──";
     os << "┘\n";
-
-    // os << "Legend: " << S1HEAD << "/"<< S1BODY << " P1  "
-    //    << S2HEAD << "/"<< S2BODY << " P2  "
-    //    << APPLE << " Apple\n";
 }

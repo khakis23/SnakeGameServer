@@ -2,7 +2,7 @@
 #include "gamecodes.h"   // only being used for START which is code (int) 1, imported for clarity of this project
 
 
-WSManager::WSManager(CoreFactory factory) : factory_(std::move(factory)) {}
+WSManager::WSManager(CoreFactory factory) : factory(std::move(factory)) {}
 
 bool WSManager::start() {
     try {
@@ -72,7 +72,7 @@ void WSManager::onConnection(auto *&ud, auto &msg, auto &op, auto *&ws) {
     auto& core = rooms[ud->room];
     // create a core if it doesn't already exist
     if (!core) {
-        core = factory_(ud->room);
+        core = factory(ud->room);
         if (!core) {
             ws->end(1011, "Core factory could not instantiate.");
             return;

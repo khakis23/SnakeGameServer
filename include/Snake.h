@@ -58,14 +58,13 @@ public:
      */
     void forceGameOver(int player_num);
 
-    Game();
-
-
     /**
      * Prints server-side game in terminal
      * @param os for printing
      */
     void debugPrint(std::ostream& os) const;
+
+    Game();
 
 private:
 
