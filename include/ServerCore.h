@@ -9,31 +9,31 @@
 #include "SnakeServer.h"
 
 
+// TODO DOCS: this keeps things modular
 class Server {
 public:
     Server();
     void run();
     void stop();
 private:
-    WSManager wsm_;
+    WSManager wsm;
 };
 
 
 inline Server::Server()
-: wsm_{
+: wsm{
     [](const std::string& /**/) -> CorePtr {
         return std::make_shared<SnakeServer>();
     }
 } {}
 
 inline void Server::run() {
-    wsm_.start();
+    wsm.start();
 }
 
 inline void Server::stop() {
-    wsm_.stop();
+    wsm.stop();
 }
-
 
 
 #endif

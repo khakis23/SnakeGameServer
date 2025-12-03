@@ -37,8 +37,6 @@ using CoreFactory = std::function<CorePtr(std::string const& roomID)>;   // ICor
 class WSManager {
 public:
     WSManager(CoreFactory factory);
-
-    // ICore overrides
     bool start();
     bool stop();
 

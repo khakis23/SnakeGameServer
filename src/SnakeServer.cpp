@@ -65,8 +65,7 @@ std::string SnakeServer::onMessage(std::string_view msg, int seat) {
                 break;
         }
     }
-
-    // game.debugPrint(std::cout);  // TODO temp
+    // game.debugPrint(std::cout);   // debugging
 
     // 3. package any game code (if any) along with the updated player position
     // 4. return a JSON of the package so that it can be published to room

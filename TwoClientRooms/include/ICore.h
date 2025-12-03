@@ -7,6 +7,7 @@
 #include <string>
 
 
+// ABC used by WSManager as an instance factory
 class ICore {
     bool user1 = false;
     bool user2 = false;
