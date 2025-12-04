@@ -5,6 +5,7 @@
 #ifndef SNAKESERVER_ICORE_H
 #define SNAKESERVER_ICORE_H
 #include <string>
+#include <memory>
 
 
 // ABC used by WSManager as an instance factory
