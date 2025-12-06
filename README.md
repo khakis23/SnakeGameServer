@@ -42,7 +42,6 @@ with no spaces.
 | **SET**          | —         | Both players ready, start game                              |
 | **DISCONNECT**   | `player`  | Notifies that a `player` disconnected                       |
 
----
 
 ### **Both Directions**
 
@@ -50,7 +49,6 @@ with no spaces.
 |-------------|----------|-----------------------------------------------|
 | **MOVE**       | `x,y`    | Movement update (player → server, server → client) |
 
----
 
 ### **To Server**
 
