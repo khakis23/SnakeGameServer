@@ -8,7 +8,6 @@
 #include <WSManager.h>
 #include "SnakeServer.h"
 
-
 // TODO DOCS: this keeps things modular
 class Server {
 public:

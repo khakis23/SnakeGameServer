@@ -31,7 +31,7 @@ struct PerSocketData {
 };
 
 using WS = uWS::WebSocket<false, true, PerSocketData>;
-using CoreFactory = std::function<CorePtr(std::string const& roomID)>;   // ICore
+using CoreFactory = std::function<CorePtr(std::string const& roomID)>;   // ICore factory function
 
 
 class WSManager {

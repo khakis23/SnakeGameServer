@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 23)
 find_package(unofficial-uwebsockets CONFIG REQUIRED)
 add_executable(SnakeServer main.cpp
         TwoClientRooms/src/WSManager.cpp
-        include/ServerCore.h
+        include/ServerPTR.h
         TwoClientRooms/include/ICore.h
         include/SnakeServer.h
         src/SnakeServer.cpp

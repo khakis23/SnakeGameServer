@@ -1,7 +1,3 @@
-//
-// Created by Tyler Black on 11/7/25.
-//
-
 #ifndef SNAKESERVER_ICORE_H
 #define SNAKESERVER_ICORE_H
 #include <string>
