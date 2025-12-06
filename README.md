@@ -65,7 +65,7 @@ with no spaces.
 The server is built using cmake and uses a single dependency.
 
 ### Prerequisites
-- [vcpkg](https://github.com/microsoft/vcpkg) to install `unofficial-uwebsockets`
+- [vcpkg](https://github.com/microsoft/vcpkg) to install `unofficial-uwebsockets` (v20.74.0)
   - (alternate option) install manually [$\mu$websockets](https://github.com/uNetworking/uWebSockets)
     - **must** change include_directories and link_libraries in **CMakeLists.txt**
 - CMake >3.31
