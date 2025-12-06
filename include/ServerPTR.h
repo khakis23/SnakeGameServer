@@ -8,7 +8,14 @@
 #include <WSManager.h>
 #include "SnakeServer.h"
 
-// TODO DOCS: this keeps things modular
+/*
+ * This class' purpose is to separate WSManager from the rest of the codebase.
+ * The simple class holds the start and stop functions of WSManager. More
+ * importantly, the class constructures the WSManager using the factory function
+ * for the ICore being used. In this program, SnakeSever, is is the derived class
+ * of the ICore.
+ */
+
 class Server {
 public:
     Server();

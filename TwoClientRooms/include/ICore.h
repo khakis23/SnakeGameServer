@@ -4,7 +4,7 @@
 #include <memory>
 
 
-// ABC used by WSManager as an instance factory
+// ABC used by WSManager
 class ICore {
     bool user1 = false;
     bool user2 = false;
